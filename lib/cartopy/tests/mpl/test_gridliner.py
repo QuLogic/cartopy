@@ -17,7 +17,10 @@
 
 from __future__ import (absolute_import, division, print_function)
 
+from distutils.version import LooseVersion
+
 from matplotlib.backends.backend_agg import FigureCanvasAgg
+import matplotlib.ft2font
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 try:
@@ -109,10 +112,14 @@ if MPL_VERSION >= '2.0':
     grid_label_image = 'gridliner_labels'
 else:
     grid_label_image = 'gridliner_labels_1.5'
+if LooseVersion(matplotlib.ft2font.__freetype_version__) >= '2.7':
+    grid_label_tolerance = 20.4
+else:
+    grid_label_tolerance = 0
 
 
 @pytest.mark.natural_earth
-@ImageTesting([grid_label_image])
+@ImageTesting([grid_label_image], tolerance=grid_label_tolerance)
 def test_grid_labels():
     plt.figure(figsize=(8, 10))
 
