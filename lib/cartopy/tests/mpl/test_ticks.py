@@ -10,7 +10,8 @@ from cartopy.mpl.ticker import LatitudeFormatter, LongitudeFormatter
 
 
 @pytest.mark.natural_earth
-@pytest.mark.mpl_image_compare(filename='xticks_no_transform.png')
+@pytest.mark.mpl_image_compare(filename='xticks_no_transform.png',
+                               tolerance=6.71)
 def test_set_xticks_no_transform():
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.coastlines('110m')
@@ -21,7 +22,8 @@ def test_set_xticks_no_transform():
 
 
 @pytest.mark.natural_earth
-@pytest.mark.mpl_image_compare(filename='xticks_cylindrical.png')
+@pytest.mark.mpl_image_compare(filename='xticks_cylindrical.png',
+                               tolerance=7.13)
 def test_set_xticks_cylindrical():
     ax = plt.axes(projection=ccrs.Mercator(min_latitude=-85, max_latitude=85))
     ax.coastlines('110m')
@@ -40,7 +42,8 @@ def test_set_xticks_non_cylindrical():
 
 
 @pytest.mark.natural_earth
-@pytest.mark.mpl_image_compare(filename='yticks_no_transform.png')
+@pytest.mark.mpl_image_compare(filename='yticks_no_transform.png',
+                               tolerance=3.75)
 def test_set_yticks_no_transform():
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.coastlines('110m')
@@ -51,7 +54,8 @@ def test_set_yticks_no_transform():
 
 
 @pytest.mark.natural_earth
-@pytest.mark.mpl_image_compare(filename='yticks_cylindrical.png')
+@pytest.mark.mpl_image_compare(filename='yticks_cylindrical.png',
+                               tolerance=4.37)
 def test_set_yticks_cylindrical():
     ax = plt.axes(projection=ccrs.Mercator(min_latitude=-85, max_latitude=85))
     ax.coastlines('110m')
@@ -72,7 +76,7 @@ def test_set_yticks_non_cylindrical():
 
 
 @pytest.mark.natural_earth
-@pytest.mark.mpl_image_compare(filename='xyticks.png')
+@pytest.mark.mpl_image_compare(filename='xyticks.png', tolerance=7.19)
 def test_set_xyticks():
     fig = plt.figure(figsize=(10, 10))
     projections = (ccrs.PlateCarree(),

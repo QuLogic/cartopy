@@ -37,7 +37,7 @@ def test_global_map():
 
 @pytest.mark.natural_earth
 @pytest.mark.mpl_image_compare(
-    filename='contour_label.png', tolerance=3.9 if _MPL_38 else 0.5)
+    filename='contour_label.png', tolerance=11.2 if _MPL_38 else 0.5)
 def test_contour_label():
     from cartopy.tests.mpl.test_caching import sample_data
     fig = plt.figure()
