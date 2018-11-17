@@ -43,10 +43,13 @@ class TestLakes(object):
 
     def test_geometry(self):
         lake_geometry = self.test_lake_geometry
-        assert lake_geometry.type == 'MultiPolygon'
-        assert len(lake_geometry) == 1
-
-        polygon = lake_geometry[0]
+        if shp._HAS_FIONA:
+            assert lake_geometry.type == 'Polygon'
+            polygon = lake_geometry
+        else:
+            assert lake_geometry.type == 'MultiPolygon'
+            assert len(lake_geometry) == 1
+            polygon = lake_geometry[0]
 
         expected = np.array([(-84.85548682324658, 11.147898667846633),
                              (-85.29013729525353, 11.176165676310276),
@@ -70,6 +73,7 @@ class TestLakes(object):
         assert actual == expected
         assert lake_record.geometry == self.test_lake_geometry
 
+    @pytest.mark.skipif(shp._HAS_FIONA, reason='Lazy loading not implemented.')
     def test_bounds(self):
         # tests that a file which has a record with a bbox can
         # use the bbox without first creating the geometry
@@ -99,10 +103,14 @@ class TestRivers(object):
 
     def test_geometry(self):
         geometry = self.test_river_geometry
-        assert geometry.type == 'MultiLineString'
-        assert len(geometry) == 1
+        if shp._HAS_FIONA:
+            assert geometry.type == 'LineString'
+            linestring = geometry
+        else:
+            assert geometry.type == 'MultiLineString'
+            assert len(geometry) == 1
+            linestring = geometry[0]
 
-        linestring = geometry[0]
         coords = linestring.coords
         assert round(abs(coords[0][0] - -124.83563045947423), 7) == 0
         assert round(abs(coords[0][1] - 56.75692352968272), 7) == 0
