@@ -1,4 +1,4 @@
-# (C) British Crown Copyright 2011 - 2019, Met Office
+# (C) British Crown Copyright 2011 - 2020, Met Office
 #
 # This file is part of cartopy.
 #
@@ -343,8 +343,7 @@ class Gridliner(object):
                      self._round(np.percentile(lim, uq), cent))
         return midpoints
 
-    def _draw_gridliner(self, nx=None, ny=None, background_patch=None,
-                        renderer=None):
+    def _draw_gridliner(self, nx=None, ny=None, renderer=None):
         """Create Artists for all visible elements and add to our Axes."""
         # Check status
         if self._plotted:
@@ -352,8 +351,7 @@ class Gridliner(object):
         self._plotted = True
 
         # Inits
-        lon_lim, lat_lim = self._axes_domain(
-            nx=nx, ny=ny, background_patch=background_patch)
+        lon_lim, lat_lim = self._axes_domain(nx=nx, ny=ny)
 
         transform = self._crs_transform()
         rc_params = matplotlib.rcParams
@@ -441,7 +439,7 @@ class Gridliner(object):
         self._assert_can_draw_ticks()
 
         # Get the real map boundaries
-        map_boundary_vertices = self.axes.background_patch.get_path().vertices
+        map_boundary_vertices = self.axes.patch.get_path().vertices
         map_boundary = sgeom.Polygon(map_boundary_vertices)
 
         self._labels = []
@@ -732,8 +730,7 @@ class Gridliner(object):
 
                     # Finally check that it does not overlap the map
                     if outline_path is None:
-                        outline_path = (self.axes.background_patch
-                                        .get_path()
+                        outline_path = (self.axes.patch.get_path()
                                         .transformed(self.axes.transData))
                         if '3.1.0' <= matplotlib.__version__ <= '3.1.2':
                             outline_path = remove_path_dupes(outline_path)
@@ -769,7 +766,7 @@ class Gridliner(object):
                             'supported.'.format(crs=self.crs))
         return True
 
-    def _axes_domain(self, nx=None, ny=None, background_patch=None):
+    def _axes_domain(self, nx=None, ny=None):
         """Return lon_range, lat_range"""
         DEBUG = False
 
@@ -788,13 +785,12 @@ class Gridliner(object):
 
         in_data = desired_trans.transform(coords)
 
-        ax_to_bkg_patch = self.axes.transAxes - \
-            background_patch.get_transform()
+        ax_to_bkg_patch = self.axes.transAxes - self.axes.patch.get_transform()
 
         # convert the coordinates of the data to the background patches
         # coordinates
         background_coord = ax_to_bkg_patch.transform(coords)
-        ok = background_patch.get_path().contains_points(background_coord)
+        ok = self.axes.patch.get_path().contains_points(background_coord)
 
         if DEBUG:
             import matplotlib.pyplot as plt
