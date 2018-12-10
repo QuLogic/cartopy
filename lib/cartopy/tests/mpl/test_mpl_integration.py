@@ -185,6 +185,8 @@ def test_multiple_projections():
                    ccrs.EckertIV(),
                    ccrs.EckertV(),
                    ccrs.EckertVI(),
+                   ccrs.Aitoff(),
+                   ccrs.Hammer(),
                    ]
 
     rows = np.ceil(len(projections) / 5)
