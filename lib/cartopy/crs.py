@@ -1580,6 +1580,48 @@ class _WarpedRectangularProjection(six.with_metaclass(ABCMeta, Projection)):
         return self._y_limits
 
 
+class Aitoff(_WarpedRectangularProjection):
+    """
+    An Aitoff projection.
+
+    This projection is a modified azimuthal equidistant projection, balancing
+    shape and scale distortion. There are no standard lines and only the
+    central point is free of distortion.
+
+    """
+
+    _handles_ellipses = False
+
+    def __init__(self, central_longitude=0, false_easting=None,
+                 false_northing=None, globe=None):
+        """
+        Parameters
+        ----------
+        central_longitude: float, optional
+            The central longitude. Defaults to 0.
+        false_easting: float, optional
+            X offset from planar origin in metres. Defaults to 0.
+        false_northing: float, optional
+            Y offset from planar origin in metres. Defaults to 0.
+        globe: :class:`cartopy.crs.Globe`, optional
+            If omitted, a default globe is created.
+
+            .. note::
+                This projection does not handle elliptical globes.
+
+        """
+        proj4_params = [('proj', 'aitoff'),
+                        ('lon_0', central_longitude)]
+        super(Aitoff, self).__init__(proj4_params, central_longitude,
+                                     false_easting=false_easting,
+                                     false_northing=false_northing,
+                                     globe=globe)
+
+    @property
+    def threshold(self):
+        return 1e5
+
+
 class _Eckert(six.with_metaclass(ABCMeta, _WarpedRectangularProjection)):
     """
     An Eckert projection.
