@@ -61,7 +61,6 @@ except ImportError:
 
 
 # Please keep in sync with INSTALL file.
-GEOS_MIN_VERSION = (3, 7, 2)
 PROJ_MIN_VERSION = (4, 9, 0)
 
 
@@ -105,40 +104,6 @@ def find_package_tree(root_path, root_package):
 
 # Dependency checks
 # =================
-
-# GEOS
-try:
-    geos_version = subprocess.check_output(['geos-config', '--version'])
-    geos_version = tuple(int(v) for v in geos_version.split(b'.')
-                         if 'dev' not in str(v))
-    geos_includes = subprocess.check_output(['geos-config', '--includes'])
-    geos_clibs = subprocess.check_output(['geos-config', '--clibs'])
-except (OSError, ValueError, subprocess.CalledProcessError):
-    warnings.warn(
-        'Unable to determine GEOS version. Ensure you have %s or later '
-        'installed, or installation may fail.' % (
-            '.'.join(str(v) for v in GEOS_MIN_VERSION), ))
-
-    geos_includes = []
-    geos_library_dirs = []
-    geos_libraries = ['geos_c']
-else:
-    if geos_version < GEOS_MIN_VERSION:
-        print('GEOS version %s is installed, but cartopy requires at least '
-              'version %s.' % ('.'.join(str(v) for v in geos_version),
-                               '.'.join(str(v) for v in GEOS_MIN_VERSION)),
-              file=sys.stderr)
-        exit(1)
-
-    geos_includes = geos_includes.decode().split()
-    geos_libraries = []
-    geos_library_dirs = []
-    for entry in geos_clibs.decode().split():
-        if entry.startswith('-L'):
-            geos_library_dirs.append(entry[2:])
-        elif entry.startswith('-l'):
-            geos_libraries.append(entry[2:])
-
 
 # Proj
 def find_proj_version_by_program(conda=None):
@@ -290,9 +255,9 @@ extensions = [
         'cartopy.trace',
         ['lib/cartopy/trace.pyx'],
         include_dirs=([include_dir, './lib/cartopy', np.get_include()] +
-                      proj_includes + geos_includes),
-        libraries=proj_libraries + geos_libraries,
-        library_dirs=[library_dir] + proj_library_dirs + geos_library_dirs,
+                      proj_includes),
+        libraries=proj_libraries,
+        library_dirs=[library_dir] + proj_library_dirs,
         language='c++',
         **extra_extension_args),
 ]
