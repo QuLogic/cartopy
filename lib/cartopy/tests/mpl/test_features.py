@@ -54,7 +54,7 @@ def test_natural_earth_custom():
 
 
 @ImageTesting(['gshhs_coastlines'],
-              tolerance=1.7 if MPL_VERSION < '2' else 0)
+              tolerance=1.7 if MPL_VERSION < '2' else 0.5)
 def test_gshhs():
     ax = plt.axes(projection=ccrs.Mollweide())
     ax.set_extent([138, 142, 32, 42], ccrs.Geodetic())
