@@ -1,4 +1,4 @@
-# (C) British Crown Copyright 2011 - 2019, Met Office
+# (C) British Crown Copyright 2011 - 2020, Met Office
 #
 # This file is part of cartopy.
 #
@@ -31,7 +31,6 @@ import os
 import warnings
 
 import numpy as np
-import six
 
 from cartopy import config
 import cartopy.crs as ccrs
@@ -457,7 +456,7 @@ class SRTMDownloader(Downloader):
         url = self.url(format_dict)
 
         srtm_online = self._urlopen(url)
-        zfh = ZipFile(six.BytesIO(srtm_online.read()), 'r')
+        zfh = ZipFile(io.BytesIO(srtm_online.read()), 'r')
 
         zip_member_path = u'{y}{x}.hgt'.format(**format_dict)
         member = zfh.getinfo(zip_member_path)
@@ -490,7 +489,7 @@ class SRTMDownloader(Downloader):
         # dependencies of cartopy.
         from bs4 import BeautifulSoup
         if filename is None:
-            from six.moves.urllib.request import urlopen
+            from urllib.request import urlopen
             url = SRTMDownloader._SRTM_BASE_URL.format(resolution=resolution)
             with urlopen(url) as f:
                 html = f.read()
