@@ -75,6 +75,7 @@ script:
 
 after_success:
   - if [[ "$NAME" == "Latest everything"* ]]; then
+      coverage combine;
       coveralls;
     fi
 
