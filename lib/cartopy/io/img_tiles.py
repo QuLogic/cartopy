@@ -17,8 +17,6 @@ using tiles in this way can be found at the
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 from abc import ABCMeta, abstractmethod
 import concurrent.futures
 import io

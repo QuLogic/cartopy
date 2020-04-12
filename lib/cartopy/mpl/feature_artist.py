@@ -10,8 +10,6 @@ This module defines the :class:`FeatureArtist` class, for drawing
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 from collections import OrderedDict
 import warnings
 import weakref

@@ -8,8 +8,6 @@ Tests for the Geostationary projection.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 from numpy.testing import assert_almost_equal
 
 import cartopy.crs as ccrs

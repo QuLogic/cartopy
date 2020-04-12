@@ -10,8 +10,6 @@ between them.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 from abc import ABCMeta, abstractproperty
 import io
 import math

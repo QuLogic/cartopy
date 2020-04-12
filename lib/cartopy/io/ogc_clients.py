@@ -17,8 +17,6 @@ this way can be found at :ref:`sphx_glr_gallery_wmts.py`.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import collections
 import io
 import math

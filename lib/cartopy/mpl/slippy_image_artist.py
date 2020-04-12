@@ -10,8 +10,6 @@ dragging and zooming of raster data.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 from matplotlib.image import AxesImage
 import matplotlib.artist
 

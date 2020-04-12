@@ -14,8 +14,6 @@ database of Earth prior to the release of the ASTER GDEM in 2009.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 import os
 import warnings
 

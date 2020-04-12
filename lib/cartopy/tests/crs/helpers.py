@@ -8,8 +8,6 @@ Helpers for Cartopy CRS subclass tests.
 
 """
 
-from __future__ import (absolute_import, division, print_function)
-
 
 def check_proj_params(name, crs, other_args):
     expected = other_args | {'proj=' + name, 'no_defs'}
