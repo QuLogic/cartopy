@@ -9,7 +9,7 @@
 # and/or pip.
 import sys
 
-PYTHON_MIN_VERSION = (3, 5)
+PYTHON_MIN_VERSION = (3, 7)
 
 if sys.version_info < PYTHON_MIN_VERSION:
     error = """
@@ -59,7 +59,7 @@ if not IS_SDIST or FORCE_CYTHON:
 try:
     import numpy as np
 except ImportError:
-    raise ImportError('NumPy 1.10+ is required to install cartopy.')
+    raise ImportError('NumPy 1.16+ is required to install cartopy.')
 
 
 # Please keep in sync with INSTALL file.
@@ -408,8 +408,6 @@ setup(
             'Programming Language :: C++',
             'Programming Language :: Python',
             'Programming Language :: Python :: 3',
-            'Programming Language :: Python :: 3.5',
-            'Programming Language :: Python :: 3.6',
             'Programming Language :: Python :: 3.7',
             'Programming Language :: Python :: 3.8',
             'Topic :: Scientific/Engineering',
