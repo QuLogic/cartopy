@@ -78,10 +78,7 @@ class TestRegrid(object):
                             target_proj, target_x, target_y)
 
 
-if MPL_VERSION < '2':
-    # Changes in zooming in old versions.
-    regrid_tolerance = 2.5
-elif MPL_VERSION < '2.0.1':
+if MPL_VERSION < '2.0.1':
     regrid_tolerance = 0.5
 elif MPL_VERSION < '2.1.0':
     # Bug in latest Matplotlib that we don't consider correct.

@@ -12,7 +12,7 @@ import cartopy.crs as ccrs
 from cartopy.mpl.geoaxes import GeoAxes
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 
-from cartopy.tests.mpl import MPL_VERSION, ImageTesting
+from cartopy.tests.mpl import ImageTesting
 
 
 TEST_PROJS = [
@@ -123,34 +123,17 @@ def test_gridliner_specified_lines():
 # The tolerance on these tests are particularly high because of the high number
 # of text objects. A new testing strategy is needed for this kind of test.
 grid_label_tol = grid_label_inline_tol = grid_label_inline_usa_tol = 0.5
-if MPL_VERSION >= '2.0':
-    grid_label_image = 'gridliner_labels'
-    if ccrs.PROJ4_VERSION < (4, 9, 3):
-        # A 0-longitude label is missing on older Proj versions.
-        grid_label_tol = 1.8
-    grid_label_inline_image = 'gridliner_labels_inline'
-    grid_label_inline_usa_image = 'gridliner_labels_inline_usa'
-    if ccrs.PROJ4_VERSION == (4, 9, 1):
-        # AzimuthalEquidistant was previously broken.
-        grid_label_inline_tol = 7.9
-        grid_label_inline_usa_tol = 7.7
-    elif ccrs.PROJ4_VERSION < (5, 0, 0):
-        # Stereographic was previously broken.
-        grid_label_inline_tol = 6.4
-        grid_label_inline_usa_tol = 4.0
-else:
-    grid_label_image = 'gridliner_labels_1.5'
+if ccrs.PROJ4_VERSION < (4, 9, 3):
+    # A 0-longitude label is missing on older Proj versions.
     grid_label_tol = 1.8
-    grid_label_inline_image = 'gridliner_labels_inline_1.5'
-    grid_label_inline_usa_image = 'gridliner_labels_inline_usa_1.5'
-    if ccrs.PROJ4_VERSION >= (5, 0, 0):
-        # Stereographic was fixed, but test image was not updated.
-        grid_label_inline_tol = 7.9
-        grid_label_inline_usa_tol = 7.9
-    elif ccrs.PROJ4_VERSION >= (4, 9, 2):
-        # AzimuthalEquidistant was fixed, but test image was not updated.
-        grid_label_inline_tol = 5.4
-        grid_label_inline_usa_tol = 7.2
+if ccrs.PROJ4_VERSION == (4, 9, 1):
+    # AzimuthalEquidistant was previously broken.
+    grid_label_inline_tol = 7.9
+    grid_label_inline_usa_tol = 7.7
+elif ccrs.PROJ4_VERSION < (5, 0, 0):
+    # Stereographic was previously broken.
+    grid_label_inline_tol = 6.4
+    grid_label_inline_usa_tol = 4.0
 if (5, 0, 0) <= ccrs.PROJ4_VERSION < (5, 1, 0):
     # Several projections are broken in these versions, so not plotted.
     grid_label_inline_tol += 5.1
@@ -161,7 +144,7 @@ elif (6, 0, 0) <= ccrs.PROJ4_VERSION:
 
 
 @pytest.mark.natural_earth
-@ImageTesting([grid_label_image], tolerance=grid_label_tol)
+@ImageTesting(['gridliner_labels'], tolerance=grid_label_tol)
 def test_grid_labels():
     fig = plt.figure(figsize=(10, 10))
 
@@ -231,7 +214,7 @@ def test_grid_labels():
 
 
 @pytest.mark.natural_earth
-@ImageTesting([grid_label_inline_image], tolerance=grid_label_inline_tol)
+@ImageTesting(['gridliner_labels_inline'], tolerance=grid_label_inline_tol)
 def test_grid_labels_inline():
     plt.figure(figsize=(35, 35))
     for i, proj in enumerate(TEST_PROJS, 1):
@@ -254,7 +237,7 @@ def test_grid_labels_inline():
 
 
 @pytest.mark.natural_earth
-@ImageTesting([grid_label_inline_usa_image],
+@ImageTesting(['gridliner_labels_inline_usa'],
               tolerance=grid_label_inline_usa_tol)
 def test_grid_labels_inline_usa():
     top = 49.3457868  # north lat

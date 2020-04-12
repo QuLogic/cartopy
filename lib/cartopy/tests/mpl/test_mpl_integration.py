@@ -36,12 +36,9 @@ else:
     _CONTOUR_IMAGE = 'global_contour_wrap_mpl_pre_3.0.0'
     if MPL_VERSION >= '2.1.0':
         _STREAMPLOT_IMAGE = 'streamplot_mpl_2.1.0'
-    elif MPL_VERSION >= '2':
-        _CONTOUR_TOL = 11.4
-        _STREAMPLOT_IMAGE = 'streamplot_mpl_2.0.0'
     else:
         _CONTOUR_TOL = 11.4
-        _STREAMPLOT_IMAGE = 'streamplot_mpl_1.4.3'
+        _STREAMPLOT_IMAGE = 'streamplot_mpl_2.0.0'
 
 
 @pytest.mark.natural_earth

@@ -29,16 +29,13 @@ class ExampleImageTesting(ImageTesting):
 
 
 @pytest.mark.natural_earth
-@ExampleImageTesting(['global_map'],
-                     tolerance=4.5 if MPL_VERSION < '2' else 0.5)
+@ExampleImageTesting(['global_map'])
 def test_global_map():
     import cartopy.examples.global_map as example
     example.main()
 
 
-if MPL_VERSION < '2':
-    contour_labels_tolerance = 7.5
-elif MPL_VERSION <= '2.0.2':
+if MPL_VERSION <= '2.0.2':
     contour_labels_tolerance = 1.24
 elif MPL_VERSION <= '2.1.2':
     contour_labels_tolerance = 0.63
