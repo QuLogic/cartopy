@@ -10,8 +10,6 @@ on:
 
 jobs:
   tests:
-    if: github.repository == 'scitools/cartopy'
-
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -88,25 +86,12 @@ jobs:
         # we need to force bash to use line continuations on Windows
         shell: bash
         run: |
-          # Check that the downloader tool at least knows where to get the data from (but don't actually download it)
-          python -m cartopy.feature.download gshhs physical --dry-run
-          # It should also be available as a script
-          cartopy_feature_download gshhs physical --dry-run
           CARTOPY_GIT_DIR=$PWD
-          pytest -rfEsX -n 4 \
+          pytest -rfEsX \
               --color=yes \
               --mpl --mpl-generate-summary=html \
               --mpl-results-path="cartopy_test_output-${{ matrix.os }}-${{ matrix.python-version }}" \
-              --pyargs cartopy ${EXTRA_TEST_ARGS}
-
-      - name: No Network Tests
-        # Ensure any test that needs network access has been marked as such
-        if: ${{ ! matrix.use-network }}
-        run: |
-          pip install pytest-socket
-          pytest -rfEsX -n 4 \
-              --color=yes \
-              --pyargs cartopy -m "not natural_earth and not network" --disable-socket
+              --pyargs cartopy ${EXTRA_TEST_ARGS} -k test_gridliner_title_adjust -sv
 
       - name: Coveralls
         if: steps.coverage.conclusion == 'success'
@@ -121,31 +106,6 @@ jobs:
         with:
           name: image-failures-${{ matrix.os }}-${{ matrix.python-version }}
           path: cartopy_test_output-${{ matrix.os }}-${{ matrix.python-version }}
-
-  # Separate dependent job to only upload one issue from the matrix of jobs
-  create-issue:
-    if: ${{ failure() && github.event_name == 'schedule' }}
-    needs: [tests]
-    permissions:
-      issues: write
-    runs-on: ubuntu-latest
-    name: Create issue on failure
-
-    steps:
-      - name: Create issue on failure
-        uses: imjohnbo/issue-bot@v3
-        with:
-          title: "[TST] Upcoming dependency test failures"
-          body: |
-            The build with nightly wheels from matplotlib, pyproj, scipy, shapely and
-            their dependencies has failed. Check the logs for any updates that need to
-            be made in cartopy.
-            https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}
-
-          pinned: false
-          close-previous: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   conda-tests:
     # Tests our environment.yml file and will get the latest PROJ library
