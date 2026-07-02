@@ -613,6 +613,7 @@ class Gridliner(matplotlib.artist.Artist):
         # Update only when needed or requested
         if self._drawn and not self._auto_update:
             return
+        print('BEGIN _draw_gridliner')
         self._drawn = True
 
         # Inits
@@ -620,6 +621,8 @@ class Gridliner(matplotlib.artist.Artist):
         transform = self._crs_transform()
         n_steps = self.n_steps
         crs = self.crs
+        print(f'axes {self.axes.projection} domain {lon_lim=} {lat_lim=} {transform=} '
+              f'{n_steps=} {crs=}')
 
         # Get nice ticks within crs domain
         lon_ticks = self.xlocator.tick_values(lon_lim[0], lon_lim[1])
@@ -631,6 +634,7 @@ class Gridliner(matplotlib.artist.Artist):
         inf = max(lat_lim[0], crs.y_limits[0])
         sup = min(lat_lim[1], crs.y_limits[1])
         lat_ticks = [value for value in lat_ticks if inf <= value <= sup]
+        print(f'{lon_ticks=} {lat_ticks=}')
 
         #####################
         # Gridlines drawing #
@@ -746,6 +750,7 @@ class Gridliner(matplotlib.artist.Artist):
             bbox = self.axes.spines[side].get_window_extent(renderer)
             specs['coords'] = [
                 getattr(bbox, specs['coord_type'] + idx) for idx in "01"]
+        print(f'populated {spines_specs=}')
 
         def update_artist(artist, renderer):
             artist.update_bbox_position_size(renderer)
@@ -759,11 +764,18 @@ class Gridliner(matplotlib.artist.Artist):
         map_boundary_path = self.axes.spines["geo"].get_path().transformed(
             self.axes.spines["geo"].get_transform())
         map_boundary = sgeom.Polygon(map_boundary_path.vertices)
+        print(f'{map_boundary=}')
 
         if self.x_inline:
             y_midpoints = self._find_midpoints(lat_lim, lat_ticks)
+            print(f'{y_midpoints=}')
+        else:
+            print('no self.x_inline')
         if self.y_inline:
             x_midpoints = self._find_midpoints(lon_lim, lon_ticks)
+            print(f'{x_midpoints=}')
+        else:
+            print('no self.y_inline')
 
         # Cache a few things so they aren't re-calculated in the loops.
         crs_transform = self._crs_transform().transform
@@ -777,6 +789,7 @@ class Gridliner(matplotlib.artist.Artist):
                  self.xformatter, self.xlabel_style.copy()),
                 ('y', lat_lines, lat_ticks,
                  self.yformatter, self.ylabel_style.copy())):
+            print(f'Processing {xylabel} labels with {formatter=}')
 
             x_inline = self.x_inline and xylabel == 'x'
             y_inline = self.y_inline and xylabel == 'y'
@@ -785,23 +798,31 @@ class Gridliner(matplotlib.artist.Artist):
             if "bbox" in label_style:
                 bbox_style.update(label_style["bbox"])
             label_style["bbox"] = bbox_style
+            print(f'{x_inline=} {y_inline=} {padding=} {bbox_style=}')
 
             formatter.set_locs(line_ticks)
 
             for line_coords, tick_value in zip(lines, line_ticks):
+                print(f'Checking {line_coords=} {tick_value=}')
                 # Intersection of line with map boundary
                 line_coords = crs_transform(line_coords)
                 infs = np.isnan(line_coords).any(axis=1)
                 line_coords = line_coords.compress(~infs, axis=0)
                 if line_coords.size == 0:
+                    print('result was NaN')
                     continue
+                print('result had no NaNs')
                 line = sgeom.LineString(line_coords)
                 if not line.intersects(map_boundary):
+                    print('result does not intersect map boundary')
                     continue
+                print('result intersected map boundary')
                 intersection = line.intersection(map_boundary)
                 del line
+                print(f'{intersection.is_empty=}')
                 if intersection.is_empty:
                     continue
+                print(f'intersection is a {type(intersection)}')
                 if isinstance(intersection, sgeom.MultiPoint):
                     if len(intersection) < 2:
                         continue
@@ -817,26 +838,39 @@ class Gridliner(matplotlib.artist.Artist):
                         # coincide, so try to combine them into longer but fewer ones.
                         intersection = shapely.line_merge(intersection)
                     if isinstance(intersection, sgeom.LineString):
+                        print(f'LineString: {intersection}')
                         intersection = [intersection]
                     elif len(intersection.geoms) > 4:
+                        print(f'MultiLineString with over 4 geometries: {intersection}')
                         # If lines are parallel, there will be many intersections
                         # merge them to get only one for the calculations below
                         merged_line = shapely.line_merge(intersection)
+                        print(f'{merged_line=}')
                         if isinstance(merged_line, sgeom.MultiLineString):
                             # our merge still produced a multilinestring, so
                             # manually concatenate the original coordinates
                             xy = np.concatenate(
                                 [inter.coords for inter in intersection.geoms], axis=0)
                             merged_line = shapely.LineString(xy)
+                            print(f'{xy=} {merged_line=}')
+                        else:
+                            print('merged_line is not a MultiLineString')
                         intersection = [merged_line]
                     else:
                         intersection = intersection.geoms
+                    print(f'{intersection=}')
                     tails = []
                     heads = []
                     for inter in intersection:
+                        print(f'Looking at {inter=}')
                         if len(inter.coords) < 2:
+                            print('less than 2 coords')
                             continue
+                        else:
+                            print('more than 1 coord')
                         n2 = min(len(inter.coords), 8)
+                        print(f'{n2=} {inter.coords[:n2:n2 - 1]=} '
+                              f'{inter.coords[-1:-n2 - 1: -n2 + 1]=}')
                         tails.append(inter.coords[:n2:n2 - 1])
                         heads.append(inter.coords[-1:-n2 - 1:-n2 + 1])
                     if not tails:
@@ -873,9 +907,11 @@ class Gridliner(matplotlib.artist.Artist):
                     continue
                 del intersection
 
+                print(f'possible {heads=} {tails=}')
                 # Loop on head and tail and plot label by extrapolation
                 for i, (pt0, pt1) in itertools.chain.from_iterable(
                         enumerate(pair) for pair in zip(tails, heads)):
+                    print(f'Attempting {i}: {pt0=} {pt1=}')
 
                     # Initial text specs
                     x0, y0 = pt0
@@ -925,6 +961,7 @@ class Gridliner(matplotlib.artist.Artist):
                     text = formatter(tick_value)
                     artist = label.artist
                     artist.set(x=x, y=y, text=text, **kw)
+                    print(f'label is {text}')
 
                     # Update loc from spine overlapping now that we have a bbox
                     # of the label.
@@ -945,6 +982,7 @@ class Gridliner(matplotlib.artist.Artist):
 
                     # Is this kind label allowed to be drawn?
                     if not self._draw_this_label(xylabel, loc):
+                        print('label is not allowed to be drawn')
                         visible = False
                     # For "geo" labels, also check against the
                     # angle-derived side so that e.g.
@@ -954,6 +992,7 @@ class Gridliner(matplotlib.artist.Artist):
                     elif loc == 'geo' and not getattr(
                             self, self._get_loc_from_angle(
                                 segment_angle) + '_labels'):
+                        print('label is not allowed to be drawn for geo angle')
                         visible = False
 
                     elif x_inline or y_inline:
@@ -965,9 +1004,11 @@ class Gridliner(matplotlib.artist.Artist):
                                   .get_transform()
                                   .transform_point(artist.get_position()))
                         visible = map_boundary_path.contains_point(center)
+                        print(f'x_inline/y_inline says overlap is {visible}')
                     else:
                         # Now loop on padding factors until it does not overlap
                         # the boundary.
+                        print('trying padding factors to fit the label')
                         visible = False
                         padding_factor = 1
                         while padding_factor < max_padding_factor:
@@ -987,6 +1028,7 @@ class Gridliner(matplotlib.artist.Artist):
                             else:
                                 visible = True
                                 break
+                        print(f'{padding_factor=} {visible=}')
 
                     # Updates
                     label.set_visible(visible)
@@ -995,6 +1037,7 @@ class Gridliner(matplotlib.artist.Artist):
                     label.xy = xylabel
                     label.loc = loc
                     self._labels.append(label)
+            print(f'Finished processing {xylabel} labels')
 
         # Now check overlapping of ordered visible labels
         if self._labels:
@@ -1008,6 +1051,7 @@ class Gridliner(matplotlib.artist.Artist):
                             break
                     else:
                         visible_labels.append(label)
+        print('END _draw_gridliner')
 
     def _get_loc_from_angle(self, angle):
         angle %= 360
