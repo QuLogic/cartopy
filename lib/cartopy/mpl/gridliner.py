@@ -807,6 +807,7 @@ class Gridliner(matplotlib.artist.Artist):
                 print(f'Checking {line_coords=} {tick_value=}')
                 # Intersection of line with map boundary
                 line_coords = crs_transform(line_coords)
+                print(f'Transformed {line_coords=}')
                 infs = np.isnan(line_coords).any(axis=1)
                 line_coords = line_coords.compress(~infs, axis=0)
                 if line_coords.size == 0:
