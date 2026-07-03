@@ -764,7 +764,8 @@ class Gridliner(matplotlib.artist.Artist):
         map_boundary_path = self.axes.spines["geo"].get_path().transformed(
             self.axes.spines["geo"].get_transform())
         map_boundary = sgeom.Polygon(map_boundary_path.vertices)
-        print(f'{map_boundary=}')
+        print('map_boundary=',
+              shapely.to_wkt(map_boundary, rounding_precision=-1, trim=False))
 
         if self.x_inline:
             y_midpoints = self._find_midpoints(lat_lim, lat_ticks)
@@ -823,6 +824,7 @@ class Gridliner(matplotlib.artist.Artist):
                 if intersection.is_empty:
                     continue
                 print(f'intersection is a {type(intersection)}')
+                print(shapely.to_wkt(intersection, rounding_precision=-1, trim=False))
                 if isinstance(intersection, sgeom.MultiPoint):
                     if len(intersection) < 2:
                         continue
