@@ -812,6 +812,10 @@ class Gridliner(matplotlib.artist.Artist):
                               for pt in intersection[-1:-n2 - 1:-n2 + 1]]]
                 elif isinstance(intersection, (sgeom.LineString,
                                                sgeom.MultiLineString)):
+                    if isinstance(intersection, sgeom.MultiLineString):
+                        # Sometimes Shapely produces multiple lines where the end points
+                        # coincide, so try to combine them into longer but fewer ones.
+                        intersection = shapely.line_merge(intersection)
                     if isinstance(intersection, sgeom.LineString):
                         intersection = [intersection]
                     elif len(intersection.geoms) > 4:
