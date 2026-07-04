@@ -763,7 +763,7 @@ class Gridliner(matplotlib.artist.Artist):
         self.axes.spines["geo"].get_window_extent(renderer)  # update coords
         map_boundary_path = self.axes.spines["geo"].get_path().transformed(
             self.axes.spines["geo"].get_transform())
-        map_boundary = sgeom.Polygon(map_boundary_path.vertices)
+        map_boundary = shapely.normalize(sgeom.Polygon(map_boundary_path.vertices))
         print('map_boundary=',
               shapely.to_wkt(map_boundary, rounding_precision=-1, trim=False))
 
@@ -814,7 +814,7 @@ class Gridliner(matplotlib.artist.Artist):
                     print('result was NaN')
                     continue
                 print('result had no NaNs')
-                line = sgeom.LineString(line_coords)
+                line = shapely.normalize(sgeom.LineString(line_coords))
                 if not line.intersects(map_boundary):
                     print('result does not intersect map boundary')
                     continue
