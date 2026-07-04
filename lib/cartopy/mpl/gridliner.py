@@ -765,7 +765,7 @@ class Gridliner(matplotlib.artist.Artist):
             self.axes.spines["geo"].get_transform())
         map_boundary = shapely.normalize(sgeom.Polygon(map_boundary_path.vertices))
         print('map_boundary=',
-              shapely.to_wkt(map_boundary, rounding_precision=-1, trim=False))
+              shapely.to_wkt(map_boundary, rounding_precision=10, trim=False))
 
         if self.x_inline:
             y_midpoints = self._find_midpoints(lat_lim, lat_ticks)
@@ -825,7 +825,7 @@ class Gridliner(matplotlib.artist.Artist):
                 if intersection.is_empty:
                     continue
                 print(f'intersection is a {type(intersection)}')
-                print(shapely.to_wkt(intersection, rounding_precision=-1, trim=False))
+                print(shapely.to_wkt(intersection, rounding_precision=10, trim=False))
                 if isinstance(intersection, sgeom.MultiPoint):
                     if len(intersection) < 2:
                         continue
@@ -841,7 +841,7 @@ class Gridliner(matplotlib.artist.Artist):
                         # coincide, so try to combine them into longer but fewer ones.
                         intersection = shapely.line_merge(intersection)
                         print('merged intersection',
-                              shapely.to_wkt(intersection, rounding_precision=-1,
+                              shapely.to_wkt(intersection, rounding_precision=10,
                                              trim=False))
                     if isinstance(intersection, sgeom.LineString):
                         print(f'LineString: {intersection}')
