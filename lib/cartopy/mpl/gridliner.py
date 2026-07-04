@@ -839,7 +839,8 @@ class Gridliner(matplotlib.artist.Artist):
                     if isinstance(intersection, sgeom.MultiLineString):
                         # Sometimes Shapely produces multiple lines where the end points
                         # coincide, so try to combine them into longer but fewer ones.
-                        intersection = shapely.line_merge(intersection)
+                        intersection = shapely.make_valid(
+                            shapely.line_merge(intersection))
                         print('merged intersection',
                               shapely.to_wkt(intersection, rounding_precision=-1,
                                              trim=False))
