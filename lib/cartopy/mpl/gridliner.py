@@ -763,7 +763,7 @@ class Gridliner(matplotlib.artist.Artist):
         self.axes.spines["geo"].get_window_extent(renderer)  # update coords
         map_boundary_path = self.axes.spines["geo"].get_path().transformed(
             self.axes.spines["geo"].get_transform())
-        map_boundary = shapely.normalize(sgeom.Polygon(map_boundary_path.vertices))
+        map_boundary = sgeom.Polygon(map_boundary_path.vertices)
         print('map_boundary=',
               shapely.to_wkt(map_boundary, rounding_precision=10, trim=False))
 
@@ -814,7 +814,7 @@ class Gridliner(matplotlib.artist.Artist):
                     print('result was NaN')
                     continue
                 print('result had no NaNs')
-                line = shapely.normalize(sgeom.LineString(line_coords))
+                line = sgeom.LineString(line_coords)
                 if not line.intersects(map_boundary):
                     print('result does not intersect map boundary')
                     continue
@@ -836,6 +836,7 @@ class Gridliner(matplotlib.artist.Artist):
                               for pt in intersection[-1:-n2 - 1:-n2 + 1]]]
                 elif isinstance(intersection, (sgeom.LineString,
                                                sgeom.MultiLineString)):
+                    orig_intersection = intersection
                     if isinstance(intersection, sgeom.MultiLineString):
                         # Sometimes Shapely produces multiple lines where the end points
                         # coincide, so try to combine them into longer but fewer ones.
@@ -855,9 +856,9 @@ class Gridliner(matplotlib.artist.Artist):
                         if isinstance(merged_line, sgeom.MultiLineString):
                             # our merge still produced a multilinestring, so
                             # manually concatenate the original coordinates
-                            merged_line = shapely.normalize(merged_line)
                             xy = np.concatenate(
-                                [inter.coords for inter in merged_line.geoms], axis=0)
+                                [inter.coords for inter in orig_intersection.geoms],
+                                axis=0)
                             merged_line = shapely.LineString(xy)
                             print(f'{xy=} {merged_line=}')
                         else:
